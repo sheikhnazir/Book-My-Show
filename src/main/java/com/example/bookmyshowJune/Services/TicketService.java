@@ -4,10 +4,8 @@ import com.example.bookmyshowJune.Dtos.RequestDto.TicketRequestDto;
 import com.example.bookmyshowJune.Dtos.ResponseDto.TicketResponseDto;
 import com.example.bookmyshowJune.Exception.NoUserFoundException;
 import com.example.bookmyshowJune.Exception.ShowNotFound;
-import com.example.bookmyshowJune.Models.Show;
-import com.example.bookmyshowJune.Models.ShowSeat;
-import com.example.bookmyshowJune.Models.Ticket;
-import com.example.bookmyshowJune.Models.User;
+import com.example.bookmyshowJune.Models.*;
+import com.example.bookmyshowJune.Repository.MovieRepository;
 import com.example.bookmyshowJune.Repository.ShowRepository;
 import com.example.bookmyshowJune.Repository.TicketRepository;
 import com.example.bookmyshowJune.Repository.UserRepository;
@@ -16,6 +14,8 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,7 +32,60 @@ public class TicketService {
     private TicketRepository ticketRepository;
 
     @Autowired
+    private MovieRepository movieRepository;
+
+    @Autowired
     private JavaMailSender emailSender;
+
+    public String cancelTicket(Integer ticketId) throws Exception{
+
+        //Ticket Validation
+        Optional<Ticket> ticketOptional = ticketRepository.findById(ticketId);
+        if (!ticketOptional.isPresent()) {
+            throw new Exception("Ticket not Found...");
+        }
+
+        Ticket ticket = ticketOptional.get();
+        String bookedSeats = ticket.getBookedSeats();
+
+        Show show1 = ticket.getShow();
+
+        // Step 1: Split the string
+        String[] bookedSeatsSplitted = bookedSeats.split(",");
+        // Convert the array to a List
+        List<String> ticketBookedSeats = Arrays.asList(bookedSeatsSplitted);
+
+        List<ShowSeat> showSeatList = show1.getShowSeatList();
+        // Traverse the array and print each element
+        for(ShowSeat showSeat : showSeatList){
+            String seatNo = showSeat.getSeatNo();
+            if(ticketBookedSeats.contains(seatNo)){
+
+                showSeat.setAvailable(true);
+            }
+        }
+
+        ticketRepository.deleteById(ticketId);
+        User user= ticket.getUser();
+        List<Ticket> ticketList = user.getTicketList();
+        for(Ticket ticket1 : ticketList) {
+
+            if(ticket1.getId() == ticketId) {
+                ticketList.remove(ticket1);
+                user.setTicketList(ticketList);
+            }
+        }
+
+        List<Ticket> ticketList1 = show1.getTicketList();
+        for(Ticket ticket1 : ticketList1) {
+
+            if(ticket1.getId() == ticketId) {
+                ticketList1.remove(ticket1);
+                show1.setTicketList(ticketList);
+            }
+        }
+        return "Ticket has been cancelled successfully...";
+    }
 
     public TicketResponseDto bookTicket(TicketRequestDto ticketRequestDto)throws NoUserFoundException, ShowNotFound,Exception {
 
@@ -63,7 +116,13 @@ public class TicketService {
 
         int totalPrice = calculateTotalPrice(show,ticketRequestDto.getRequestedSeats());
 
-        ticket.setTotalTicketsPrice(totalPrice);
+        ticket.setTotalTicketsPrice(totalPrice);  // Setting total cost of tickets user is going to book
+
+        Movie movie = show.getMovie();
+
+        movie.setBoxOfficeCollection(movie.getBoxOfficeCollection() + totalPrice);
+
+        movieRepository.save(movie);
 
         //Convert the list of booked seats into string from list
         String bookedSeats = convertListToString(ticketRequestDto.getRequestedSeats());
@@ -166,5 +225,13 @@ public class TicketService {
 
         return ticketResponseDto;
     }
+
 }
+
+
+
+
+//        Dear Nazir Ahmad Shiekh your registration for PARVAAZ IAS/KAS is successful.
+//        Please note down MY-PRVZCC-21-00337 as your application ID.
+//        The information has also been mailed to your registered email address sheikhnazir248@gmail.com.
 

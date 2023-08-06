@@ -1,6 +1,7 @@
 package com.example.bookmyshowJune.Models;
 
 import com.example.bookmyshowJune.Enums.SeatType;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -20,6 +21,7 @@ public class TheaterSeat {
 
     @ManyToOne
     @JoinColumn
+    @JsonBackReference
     private Theater theater;
 
 }

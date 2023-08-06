@@ -2,6 +2,7 @@ package com.example.bookmyshowJune.Models;
 
 
 import com.example.bookmyshowJune.Enums.SeatType;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -27,6 +28,7 @@ public class ShowSeat {
 
     @ManyToOne
     @JoinColumn
+    @JsonBackReference
     private Show show;
 
 }

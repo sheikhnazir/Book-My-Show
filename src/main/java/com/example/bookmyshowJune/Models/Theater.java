@@ -1,5 +1,6 @@
 package com.example.bookmyshowJune.Models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,9 +29,11 @@ public class Theater {
 
     //Keeping in mind the parent class
     @OneToMany(mappedBy = "theater",cascade = CascadeType.ALL)
+    @JsonBackReference
     private List<TheaterSeat> theaterSeatList = new ArrayList<>();
 
     @OneToMany(mappedBy = "theater",cascade = CascadeType.ALL)
+    @JsonBackReference
     private List<Show> showList = new ArrayList<>();
 
 }

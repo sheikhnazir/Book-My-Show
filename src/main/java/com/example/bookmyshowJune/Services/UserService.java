@@ -3,19 +3,25 @@ package com.example.bookmyshowJune.Services;
 import com.example.bookmyshowJune.Dtos.RequestDto.AddUserDto;
 import com.example.bookmyshowJune.Dtos.ResponseDto.UserResponseDto;
 import com.example.bookmyshowJune.Exception.NoUserFoundException;
+import com.example.bookmyshowJune.Models.Ticket;
 import com.example.bookmyshowJune.Models.User;
+import com.example.bookmyshowJune.Repository.TicketRepository;
 import com.example.bookmyshowJune.Repository.UserRepository;
 import com.example.bookmyshowJune.Transformers.UserTransformer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    TicketRepository ticketRepository;
 
     public String addUser(AddUserDto userDto){
 
@@ -58,4 +64,19 @@ public class UserService {
 
     }
 
+    public List<Ticket> getAllTicketsBookedByPerson(Integer userId) throws NoUserFoundException {
+
+        Optional<User> optionalUser = userRepository.findById(userId);
+
+        if(!optionalUser.isPresent()) {
+            throw new NoUserFoundException("Invalid userId, please enter correct userId");
+        }
+
+//        User user = optionalUser.get();
+        List<Ticket> ticketList = ticketRepository.findByUserId(userId);
+
+//        List<Ticket> ticketList = user.getTicketList();
+
+        return ticketList;
+    }
 }

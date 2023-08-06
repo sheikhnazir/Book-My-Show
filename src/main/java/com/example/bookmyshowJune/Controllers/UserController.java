@@ -2,11 +2,14 @@ package com.example.bookmyshowJune.Controllers;
 
 import com.example.bookmyshowJune.Dtos.RequestDto.AddUserDto;
 import com.example.bookmyshowJune.Dtos.ResponseDto.UserResponseDto;
+import com.example.bookmyshowJune.Exception.NoUserFoundException;
+import com.example.bookmyshowJune.Models.Ticket;
 import com.example.bookmyshowJune.Models.User;
 import com.example.bookmyshowJune.Services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -48,7 +51,14 @@ public class UserController {
 
     @GetMapping("/findUsersGreaterThanAAge")
     public List<User> getAllUsers(@RequestParam("age")Integer age){
+
         return userService.getAllUserGreaterThan(age);
+    }
+    @GetMapping("/getAllTicketsBookedByPerson")
+    public List<Ticket> getAllTicketsBookedByPerson(@PathVariable Integer userId) throws Exception {
+
+        List<Ticket> ticketList = userService.getAllTicketsBookedByPerson(userId);
+        return ticketList;
     }
 
 }

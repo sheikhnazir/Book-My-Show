@@ -3,6 +3,7 @@ package com.example.bookmyshowJune.Models;
 
 import com.example.bookmyshowJune.Enums.Genre;
 import com.example.bookmyshowJune.Enums.Language;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -41,7 +42,10 @@ public class Movie {
     @Enumerated(EnumType.STRING)
     private Language language;
 
+    private int boxOfficeCollection;
+
     @OneToMany(mappedBy = "movie",cascade = CascadeType.ALL)
+    @JsonBackReference
     private List<Show> showList = new ArrayList<>();
 
 }

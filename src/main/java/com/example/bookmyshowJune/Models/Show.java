@@ -1,5 +1,6 @@
 package com.example.bookmyshowJune.Models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,16 +30,20 @@ public class Show {
 
     @ManyToOne
     @JoinColumn
+    @JsonBackReference
     private Movie movie;
 
     @ManyToOne
     @JoinColumn
+    @JsonBackReference
     private Theater theater;
 
     @OneToMany(mappedBy = "show",cascade = CascadeType.ALL)
+    @JsonBackReference // To overcome the recursion problem also we can use JsonIgnore
     private List<ShowSeat> showSeatList = new ArrayList<>();
 
     @OneToMany(mappedBy = "show",cascade = CascadeType.ALL)
+    @JsonBackReference
     private List<Ticket> ticketList = new ArrayList<>();
 
 }
