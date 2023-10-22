@@ -25,7 +25,13 @@ public class UserService {
 
     public String addUser(AddUserDto userDto){
 
-        User user = UserTransformer.convertDtoToEntity(userDto);
+//        User user = UserTransformer.convertDtoToEntity(userDto);
+        User user = new User();
+        user.setMobNo(userDto.getMobNo());
+        user.setEmail(userDto.getEmailId());
+        user.setName(userDto.getName());
+        user.setAge(userDto.getAge());
+
         userRepository.save(user);
 
         return "User has been added successfully ";
