@@ -1,6 +1,7 @@
 package com.example.bookmyshowJune.ServiceTest;
 
 import com.example.bookmyshowJune.Dtos.RequestDto.AddUserDto;
+import com.example.bookmyshowJune.Dtos.ResponseDto.UserResponseDto;
 import com.example.bookmyshowJune.Exception.NoUserFoundException;
 import com.example.bookmyshowJune.Models.User;
 import com.example.bookmyshowJune.Repository.UserRepository;
@@ -15,7 +16,9 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
@@ -65,11 +68,45 @@ public class UserServiceTest {
 
     @Test
     @Transactional
-    public void testGetOldestUserNoUserFound() {
-        // Mock the UserRepository to return an empty list
-        Mockito.when(userRepository.findAll()).thenReturn(new ArrayList<>());
+    public void testGetOldestUser() throws NoUserFoundException {
+        // Create a list of sample users
+        List<User> users = new ArrayList<>();
+        User user1 = new User();
+        user1.setId(1);
+        user1.setName("User1");
+        user1.setAge(25);
+        user1.setEmail("user1@gmail.com");
+        user1.setMobNo("1772883349");
 
-        // Call the getOldestUser method and expect a NoUserFoundException
-        assertThrows(NoUserFoundException.class, () -> userService.getOldestUser());
+        User user2 = new User();
+        user2.setId(2);
+        user2.setName("User2");
+        user2.setAge(30);
+        user1.setEmail("user2@gmail.com");
+        user1.setMobNo("7733628359");
+
+        User user3 = new User();
+        user3.setId(3);
+        user3.setName("User3");
+        user3.setAge(35);
+        user1.setEmail("user3@gmail.com");
+        user1.setMobNo("9982758372");
+
+        users.add(user1);
+        users.add(user2);
+        users.add(user3);
+
+        // Mock the UserRepository to return the list of users
+        Mockito.when(userRepository.findAll()).thenReturn(users);
+
+        // Call the getOldestUser method
+        UserResponseDto userResponseDto = userService.getOldestUser();
+
+        // Verify that the userRepository.findAll method was called
+        Mockito.verify(userRepository).findAll();
+
+        // Check if the response contains the correct user data
+        assertEquals("User3", userResponseDto.getName()); // The oldest user is User3 with age 35
     }
+
 }
